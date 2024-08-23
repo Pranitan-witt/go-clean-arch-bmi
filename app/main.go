@@ -10,14 +10,14 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 
-	mysqlRepo "github.com/bxcodec/go-clean-arch/internal/repository/mysql"
-
 	"github.com/bxcodec/go-clean-arch/article"
+	"github.com/bxcodec/go-clean-arch/bmi"
+	mysqlRepo "github.com/bxcodec/go-clean-arch/internal/repository/mysql"
 	"github.com/bxcodec/go-clean-arch/internal/rest"
 	"github.com/bxcodec/go-clean-arch/internal/rest/middleware"
-	"github.com/joho/godotenv"
 )
 
 const (
@@ -79,6 +79,11 @@ func main() {
 	// Build service Layer
 	svc := article.NewService(articleRepo, authorRepo)
 	rest.NewArticleHandler(e, svc)
+
+	bmiRepo := mysqlRepo.NewBMIRepository(dbConn)
+
+	bmiSvc := bmi.NewBMIService(bmiRepo)
+	rest.NewBMIHandler(e, bmiSvc)
 
 	// Start Server
 	address := os.Getenv("SERVER_ADDRESS")
